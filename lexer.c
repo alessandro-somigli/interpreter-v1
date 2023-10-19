@@ -11,14 +11,18 @@
  * returns the extracted Token struct representing the identifier token.
  */
 struct Token get_ident_token(FILE *file, char ch) {
-    struct Token token;
-    token.type = T_VAR;
+	char *word_str = (char*)malloc(ISIZE_IDENT);
+	word_str[0] = ch;
+	int i_word = 1;
 
-    char word_str[64] = {ch};
-    int i_word = 1;
+	struct Token token;
+    token.type = T_IDENT;
+    token.value.vstr = word_str;
+
     while ((ch = fgetc(file)) != EOF && (isalnum(ch) || ch == '_'))
         word_str[i_word++] = ch;
     ungetc(ch, file);
+    word_str[i_word] = '\0';
 
     // check all keywords
     if (strcmp(word_str, "let") == 0) {
@@ -152,7 +156,7 @@ struct Token* tokenize(FILE *file) {
 				tokens[i_tokens++] = token;
 				break;
 			default:
-	            raise_err("Error - Unrecognized Character: unrecognized character found in source: %c", ch);
+	            raise_err("Error - Unrecognized Character: unrecognized character found in source: \'%c\'", ch);
         }
 
         if (i_tokens == s_tokens) {

@@ -1,6 +1,7 @@
 #include<stdio.h>
 
 #define ISIZE_STR 8
+#define ISIZE_IDENT 64
 #define ISIZE_TOKEN_ARR 512
 
 enum TokenType {
@@ -34,7 +35,7 @@ enum TokenType {
 
     // VARS
 	T_ASSIGN,
-	T_VAR,
+	T_IDENT,
 
     // PARENTHESIS
 	T_LPAREN,
