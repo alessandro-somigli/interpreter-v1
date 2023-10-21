@@ -6,6 +6,16 @@
 
 #define ISIZE_MAIN_PROC 1024
 
+struct AST* parse_stmt(struct Token* tokens, int* i_tokens);
+struct AST* parse_expr(struct Token* tokens, int* i_tokens);
+struct AST* parse_additive_expr(struct Token* tokens, int* i_tokens);
+struct AST* parse_multiplicative_expr(struct Token* tokens, int* i_tokens);
+struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens);
+
+int assert(struct Token token, enum TokenType type) {
+	return token.type == type? TRUE:FALSE;
+}
+
 /* return NUM_LITERAL or IDENTIFIER statement and eat the corresponding token
  * */
 struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens) {
@@ -31,6 +41,14 @@ struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens) {
 			expr->data.NUM_LIT.value.vfloat = token.value.vfloat;
 			(*i_tokens)++;
 			break;
+		case T_LPAREN:
+			(*i_tokens)++; // eat opening parens
+			expr = parse_expr(tokens, i_tokens);
+			if (tokens[*i_tokens].type != T_RPAREN)
+			  raise_err("Error - Missing Closing Paren: closing parenthesis was not found");
+			else (*i_tokens)++;
+			break;
+
 		default:
 			raise_err("Error - Unexpected Token: unrecognized token found while parsing: %d", token.type);
 	}
@@ -38,19 +56,35 @@ struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens) {
 	return expr;
 }
 
-// FINISH HERE
-/*
- * */
-struct AST* parse_additive_expr(struct Token* tokens, int* i_tokens) {
+struct AST* parse_multiplicative_expr(struct Token* tokens, int* i_tokens) {
 	struct AST* left = get_ast();
 	left = parse_primary_expr(tokens, i_tokens);
+
+	while (tokens[*i_tokens].type == T_MUL || tokens[*i_tokens].type == T_DIV || tokens[*i_tokens].type == T_MOD) {
+		struct AST* bin_op = get_ast();
+		enum TokenType t = tokens[(*i_tokens)++].type;
+		bin_op->tag = BIN_EXPR; 		// careful: eat token here
+		bin_op->data.BIN_EXPR.operand = t==T_MUL? '*':t==T_DIV? '/':'%';
+		bin_op->data.BIN_EXPR.vleft = left;
+		bin_op->data.BIN_EXPR.vright = parse_primary_expr(tokens, i_tokens);
+
+		left = bin_op;
+	}
+
+	return left;
+}
+
+struct AST* parse_additive_expr(struct Token* tokens, int* i_tokens) {
+	struct AST* left = get_ast();
+	// left = parse_primary_expr(tokens, i_tokens);
+	left = parse_multiplicative_expr(tokens, i_tokens);
 
 	while (tokens[*i_tokens].type == T_ADD || tokens[*i_tokens].type == T_SUB) {
 		struct AST* bin_op = get_ast();
 		bin_op->tag = BIN_EXPR; 		// careful: eat token here
 		bin_op->data.BIN_EXPR.operand = tokens[(*i_tokens)++].type==T_ADD? '+':'-';
 		bin_op->data.BIN_EXPR.vleft = left;
-		bin_op->data.BIN_EXPR.vright = parse_primary_expr(tokens, i_tokens);
+		bin_op->data.BIN_EXPR.vright = parse_multiplicative_expr(tokens, i_tokens);
 
 		left = bin_op;
 	}
