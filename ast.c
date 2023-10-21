@@ -2,10 +2,10 @@
 
 #include"ast.h"
 
-struct AST* getAST() {
+struct AST* get_ast() {
 	return (struct AST*)malloc(sizeof(struct AST));
 }
 
-void freeAST(struct AST* ast) {
+void free_ast(struct AST* ast) {
 	// free recursively here
 }

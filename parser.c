@@ -10,7 +10,7 @@
  * */
 struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens) {
 	struct Token token = tokens[*i_tokens];
-	struct AST* expr = getAST();
+	struct AST* expr = get_ast();
 
 	// parse primary expression
 	switch (token.type) {
@@ -42,11 +42,11 @@ struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens) {
 /*
  * */
 struct AST* parse_additive_expr(struct Token* tokens, int* i_tokens) {
-	struct AST* left = getAST();
+	struct AST* left = get_ast();
 	left = parse_primary_expr(tokens, i_tokens);
 
 	while (tokens[*i_tokens].type == T_ADD || tokens[*i_tokens].type == T_SUB) {
-		struct AST* bin_op = getAST();
+		struct AST* bin_op = get_ast();
 		bin_op->tag = BIN_EXPR; 		// careful: eat token here
 		bin_op->data.BIN_EXPR.operand = tokens[(*i_tokens)++].type==T_ADD? '+':'-';
 		bin_op->data.BIN_EXPR.vleft = left;
@@ -68,7 +68,7 @@ struct AST* parse_stmt(struct Token* tokens, int* i_tokens) {
 	return parse_expr(tokens, i_tokens);
 }
 
-struct AST makeAST(FILE* file) {
+struct AST make_ast(FILE* file) {
     struct Token* tokens = tokenize(file);
 
     // create the root procedure

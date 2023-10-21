@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     if (file == NULL)
     	raise_err("File Not Found: the path does not lead to any file");
 
-    struct AST ast = makeAST(file);
+    struct AST ast = make_ast(file);
 
     print_ast(&ast, 0);
 

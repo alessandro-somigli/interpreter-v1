@@ -48,6 +48,6 @@ struct AST {
     } data;
 };
 
-struct AST* getAST();
+struct AST* get_ast();
 
-void freeAST(struct AST* ast);
+void free_ast(struct AST* ast);
