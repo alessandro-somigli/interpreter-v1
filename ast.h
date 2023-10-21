@@ -13,7 +13,6 @@ struct AST {
         // procedures are arrays of instructions
         struct {
         	struct AST** arr; // array of pointers
-        	int max_size;
         	int size;
         } PROC;
         // numeric literals are just numbers

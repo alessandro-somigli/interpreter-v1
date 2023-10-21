@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
     if (file == NULL)
     	raise_err("File Not Found: the path does not lead to any file");
 
-    struct AST ast = make_ast(file);
+    struct AST* ast = make_ast(file);
+    print_ast(ast, 0);
+    free_ast(ast);
 
-    print_ast(&ast, 0);
-
-    printf("finished.");
+    printf("finished!");
 
 	return EXIT_SUCCESS;
 }

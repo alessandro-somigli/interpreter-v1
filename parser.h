@@ -1,1 +1,1 @@
-struct AST make_ast(FILE* file);
+struct AST* make_ast(FILE* file);

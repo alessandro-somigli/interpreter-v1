@@ -12,12 +12,6 @@ struct AST* parse_additive_expr(struct Token* tokens, int* i_tokens);
 struct AST* parse_multiplicative_expr(struct Token* tokens, int* i_tokens);
 struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens);
 
-int assert(struct Token token, enum TokenType type) {
-	return token.type == type? TRUE:FALSE;
-}
-
-/* return NUM_LITERAL or IDENTIFIER statement and eat the corresponding token
- * */
 struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens) {
 	struct Token token = tokens[*i_tokens];
 	struct AST* expr = get_ast();
@@ -97,36 +91,35 @@ struct AST* parse_expr(struct Token* tokens, int* i_tokens) {
 }
 
 struct AST* parse_stmt(struct Token* tokens, int* i_tokens) {
-	// nothing to do yet I guess, skip to parse expr
+	// nothing to do yet, skip to parse_expr
 
 	return parse_expr(tokens, i_tokens);
 }
 
-struct AST make_ast(FILE* file) {
+struct AST* make_ast(FILE* file) {
     struct Token* tokens = tokenize(file);
 
     // create the root procedure
-    struct AST root;
-    root.tag = PROC;
-    root.data.PROC.arr = (struct AST**)malloc(ISIZE_MAIN_PROC * sizeof(struct AST*));
-    root.data.PROC.max_size = ISIZE_MAIN_PROC;
+    struct AST* root = get_ast();
+    root->tag = PROC;
+    root->data.PROC.arr = (struct AST**)malloc(ISIZE_MAIN_PROC * sizeof(struct AST*));
 
-    int i_proc = 0, i_tokens = 0;
+    int i_tokens = 0, i_proc = 0, s_proc = ISIZE_MAIN_PROC;
 
     while (tokens[i_tokens].type != T_EOF) {
-    	root.data.PROC.arr[i_proc++] = parse_stmt(tokens, &i_tokens);
+    	root->data.PROC.arr[i_proc++] = parse_stmt(tokens, &i_tokens);
+
+    	if (s_proc == i_proc) { // dynamic resizing of main PROC
+    		s_proc <<= 1;
+    		root->data.PROC.arr = (struct AST**)realloc(root->data.PROC.arr, s_proc * sizeof(struct AST*));
+    	}
+
     }
 
-    root.data.PROC.size = i_proc;
+    root->data.PROC.size = i_proc;
 
-    // after AST is generated free memory of tokens
-    // no need to free generated strings, their pointers are passed to the AST
+    // free tokens after generating AST
     free(tokens);
-
-    // remember to free after AST is done:
-    // proc arrays
-    // string literals
-    // keyword/ident strings
 
     return root;
 }
@@ -134,8 +127,8 @@ struct AST make_ast(FILE* file) {
 /* order of precedence:
  * primary expr
  * unary expr
- * multiplicative expr
- * additive expr
+ * multiplicative expr | done
+ * additive expr | done
  * comparative expr
  * logical expr
  * function call
