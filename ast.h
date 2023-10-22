@@ -18,8 +18,8 @@ struct AST {
         // numeric literals are just numbers
         struct { // NUM_LIT
         	enum {
-        		INTEGER,
-				FLOAT
+        		AST_INTEGER,
+				AST_FLOAT
         	} type;
             union {
                 int vint;

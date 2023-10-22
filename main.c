@@ -3,6 +3,7 @@
 
 #include"parser.h"
 #include"ast.h"
+#include"runtime.h"
 #include"util.h"
 
 void print_depth(int depth) {
@@ -28,7 +29,7 @@ void print_ast(struct AST* root, int depth) {
 			printf("str_lit: %s\n", root->data.STR_LIT.str);
 			break;
 		case NUM_LIT:
-			if (root->data.NUM_LIT.type == INTEGER)
+			if (root->data.NUM_LIT.type == AST_INTEGER)
 				printf("num_lit: %d\n", root->data.NUM_LIT.value.vint);
 			else
 				printf("num_lit: %f\n", root->data.NUM_LIT.value.vfloat);
@@ -67,6 +68,12 @@ int main(int argc, char *argv[]) {
 
     struct AST* ast = make_ast(file);
     print_ast(ast, 0);
+
+    struct RunVal val = eval(ast);
+    if (val.type == RV_INTEGER)
+    	printf("%d\n", val.value.vint);
+    else printf("%f\n", val.value.vfloat);
+
     free_ast(ast);
 
     printf("finished!");

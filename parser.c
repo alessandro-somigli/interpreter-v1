@@ -25,13 +25,13 @@ struct AST* parse_primary_expr(struct Token* tokens, int* i_tokens) {
 			break;
 		case T_INTEGER: // handle num literals
 			expr->tag = NUM_LIT;
-			expr->data.NUM_LIT.type = INTEGER;
+			expr->data.NUM_LIT.type = AST_INTEGER;
 			expr->data.NUM_LIT.value.vint = token.value.vint;
 			(*i_tokens)++;
 			break;
 		case T_FLOAT: // handle num literals
 			expr->tag = NUM_LIT;
-			expr->data.NUM_LIT.type = FLOAT;
+			expr->data.NUM_LIT.type = AST_FLOAT;
 			expr->data.NUM_LIT.value.vfloat = token.value.vfloat;
 			(*i_tokens)++;
 			break;
@@ -70,12 +70,11 @@ struct AST* parse_multiplicative_expr(struct Token* tokens, int* i_tokens) {
 
 struct AST* parse_additive_expr(struct Token* tokens, int* i_tokens) {
 	struct AST* left = get_ast();
-	// left = parse_primary_expr(tokens, i_tokens);
 	left = parse_multiplicative_expr(tokens, i_tokens);
 
 	while (tokens[*i_tokens].type == T_ADD || tokens[*i_tokens].type == T_SUB) {
 		struct AST* bin_op = get_ast();
-		bin_op->tag = BIN_EXPR; 		// careful: eat token here
+		bin_op->tag = BIN_EXPR;
 		bin_op->data.BIN_EXPR.operand = tokens[(*i_tokens)++].type==T_ADD? '+':'-';
 		bin_op->data.BIN_EXPR.vleft = left;
 		bin_op->data.BIN_EXPR.vright = parse_multiplicative_expr(tokens, i_tokens);
